@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>multi</title>
+
+    <script type="text/javascript">
+      window.MODE_DEFAULT = "Lua";
+    </script>
+
+    <!-- Code Mirror -->
+    <script src="assets/codemirror-5.19.0/lib/codemirror.js"></script>
+    <script src="assets/codemirror-5.19.0/addon/mode/overlay.js"></script>
+    <script src="assets/codemirror-5.19.0/mode/markdown/markdown.js"></script>
+    <script src="assets/codemirror-5.19.0/mode/lua/lua.js"></script>
+    <script src="assets/codemirror-5.19.0/mode/moonscript/moonscript.js"></script>
+    <script src="assets/codemirror-5.19.0/mode/gfm/gfm.js"></script>
+    <link rel="stylesheet" href="assets/codemirror-5.19.0/lib/codemirror.css">
+    <script src="assets/codemirror-5.19.0/mode/javascript/javascript.js"></script>
+
+    <!-- Font Awesome -->
+    <script src="http://use.fontawesome.com/eb37701e97.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/bootstrap.min.css">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style type="text/css">
+      .CodeMirror {
+        height: auto;
+      }
+      #player {
+        display: none;
+        background:#fff; 
+        width:100%; 
+        height:100%; 
+        z-index:100000;
+        top:0; 
+        left:0; 
+        position:fixed; 
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" id="navbar-example">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button class="collapsed navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-example-js-navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="#" class="navbar-brand">multi</a>
+        </div>
+        <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+          <p class="navbar-text" id="version"><i class="fa fa-cog fa-spin"></i></p>
+          <ul class="nav navbar-nav">
+              <li class="dropdown">
+                  <div class="navbar-form">
+                      <div id="language" class="btn-group">
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">&nbsp;</a>
+                          <ul class="dropdown-menu" id="uiLanguages"></ul>
+                      </div>
+                  </div>
+              </li>
+
+              <li>
+                <form class="navbar-form form-inline">
+                  <div class="btn-group" id="codeLanguages" role="group" aria-label="...">
+                  </div>
+                </form>
+              </li>
+          </ul>
+
+          <div class="nav navbar-nav navbar-right">
+            <form class="navbar-form form-inline">
+              <button type="button" class="btn btn-primary" title="Embed" data-toggle="modal" data-target="#embed" id="embed_button" onclick="window.embed();"><i class="fa fa-code" aria-hidden="true"></i>
+</button>
+              <button type="button" class="btn btn-primary" title="Share" data-toggle="modal" data-target="#share" id="share_button" onclick="window.share();"><i class="fa fa-share-alt" aria-hidden="true"></i>
+</button>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Embed -->
+    <div class="modal fade" id="embed" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Embed</h4>
+          </div>
+          <div class="modal-body">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="embed_content" checked="checked">
+                Keep Content
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="embed_autoplay" >
+                Auto-play
+              </label>
+            </div>
+            <p>Copy and paste the code below into your website:</p>
+            <pre id="embed_code"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Share -->
+    <div class="modal fade" id="share" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Share</h4>
+          </div>
+          <div class="modal-body">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="share_content" checked="checked">
+                Keep Content
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="share_autoplay" >
+                Auto-play
+              </label>
+            </div>
+            <p>Copy the link below. You can paste the link anywhere you can type, including in emails, Word documents, your browser's address bar, Facebook chats, and more.</p>
+            <pre id="share_code"></pre>
+            <p>
+              <!-- AddToAny BEGIN -->
+              <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+              <a class="a2a_dd" href="https://www.addtoany.com/share?linkurl=&linkname="></a>
+              <a class="a2a_button_facebook"></a>
+              <a class="a2a_button_twitter"></a>
+              <a class="a2a_button_google_plus"></a>
+              </div>
+              <script>
+              var a2a_config = a2a_config || {};
+              a2a_config.linkurl = "http://google.com";
+              a2a_config.num_services = 10;
+              window.a2a_config = a2a_config;
+              </script>
+              <script async src="https://static.addtoany.com/menu/page.js"></script>
+              <!-- AddToAny END -->
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="player">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-offset-4 col-md-4" id="messages" style="padding-top:30px;">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button id="stop" class="btn btn-success" style="position:fixed;top:25px;right:25px;z-index:1000000;width:50px;line-height:50px;margin:0;padding:0;border-radius:50%;display:none;">
+      <i class="fa fa-stop" aria-hidden="true"></i>
+    </button>
+    
+    <button id="pause" class="btn btn-success" style="position:fixed;top:25px;right:80px;z-index:1000000;width:50px;line-height:50px;margin:0;padding:0;border-radius:50%;display:none;">
+      <i class="fa fa-pause" aria-hidden="true"></i>
+    </button>
+
+    <button id="play" class="btn btn-success" style="position:fixed;bottom:25px;right:25px;z-index:1000;width:50px;line-height:50px;margin:0;padding:0;border-radius:50%">
+      <i class="fa fa-play" aria-hidden="true"></i>
+    </button>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div id="editor" class="col-md-12" style="padding:0!important;margin:50px 0 0 0;">
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/jquery.min.js" type="text/javascript"></script>
+    <script src="assets/bootstrap.min.js" type="text/javascript"></script>
+    <script src="assets/base64.min.js" type="text/javascript"></script>
+
+    <script src="assets/lua.vm.js" type="text/javascript"></script>
+    <script src="assets/moonscript.js" type="text/javascript"></script>
+    <script src="assets/moonscript.js.mem" type="text/javascript"></script>
+    <script src="assets/showdown.min.js" type="text/javascript"></script>
+    <script src="assets/script.js" type="text/javascript"></script>
+    <script type="text/lua">
+    
+      local multi = require("https://cdn.rawgit.com/olueiro/multi/master/multi.lua")
+      
+      local main
+
+      local parse = function(t)
+        local content = ""
+        if type(t) == "table" then
+          for key, value in pairs(t) do
+            content = content .. key .. ": " .. tostring(value) .. " \n"
+          end
+        end
+        return content
+      end
+
+      local insert = function(html)
+        window:jQuery("#messages"):append(html)
+      end
+
+      window:jQuery(function()
+      
+        window:jQuery("#version"):html(multi._VERSION)
+
+        for locale, data in pairs(multi.localization) do
+
+          local li = window:jQuery("<li></li>")
+          local a = window:jQuery("<a></a>")
+          a:attr("data-localization", locale)
+          a:attr("style", "cursor:pointer;")
+          a:html(data.language)
+          a:on("click", function(this)
+            multi.configuration.localization =  window:jQuery(this):attr("data-localization")
+          end)
+          li:append(a)
+
+          window:jQuery("#uiLanguages"):append(li)
+
+        end
+
+        window.LuaReady()
+
+        multi.configuration.events["error"] = function(parent, message, details)
+          insert(window:jQuery('<div class="alert alert-danger" role="alert"></div>'):text(parse(details)))
+        end
+
+        multi.configuration.events["notice"] = function(parent, user, message, details)
+          insert(window:jQuery('<div class="alert alert-warning" role="alert"></div>'):text(parse(details)))
+        end
+        
+        multi.configuration.events["section-open"] = function(parent, user, data)
+          insert(window:jQuery('<h3></h3>'):text(data.title))
+        end
+        
+        multi.configuration.events["text"] = function(parent, user, data)
+          insert(window:jQuery('<p></p>'):html(window.markdown:makeHtml(data.content)))
+        end
+        
+        local queries = 0
+        
+        multi.configuration.events["query"] = function(parent, user, data)
+
+          if data.query then
+            insert(window:jQuery('<p></p>'):html(window.markdown:makeHtml(data.query.content)))
+          end
+          
+          for _, item in pairs(data.list) do
+            local btn = window:jQuery('<button type="button" class="btn btn-block btn-primary"></button>'):attr("data-query", queries):attr("data-value", item):html(item):click(function(this)
+              window:jQuery("*[data-query='".. window:jQuery(this):attr("data-query") .."']"):each(function(this)
+                window:jQuery(this):attr("disabled", "disabled")
+              end)
+              
+              window:jQuery(this):html( window:jQuery(this):html() .. [[&nbsp;<i class="fa fa-check-circle" aria-hidden="true"></i>
+]])
+              main:reply("", window:jQuery(this):attr("data-value"))
+            end)
+            insert(window:jQuery('<p></p>'):append(btn))
+          end
+          
+          if data.free then
+            local html = [[
+            <div class="input-group">
+              <input id="custom-]] .. queries ..[[" type="text" class="form-control" data-query="]] .. queries ..[[" placeholder="?">
+              <span class="input-group-btn">
+                <button class="btn btn-primary" for="custom-]] .. queries ..[["  data-query="]] .. queries ..[[" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i>
+</button>
+              </span>
+            </div>
+            ]]
+            
+            window:jQuery("#messages"):append(html)
+            
+            window:jQuery('*[for="custom-' .. queries .. '"]'):click(function(this)
+              window:jQuery("*[data-query='".. window:jQuery(this):attr("data-query") .."']"):each(function(this)
+                window:jQuery(this):attr("disabled", "disabled")
+              end)
+              window:jQuery(this):html( window:jQuery(this):html() .. [[&nbsp;<i class="fa fa-check-circle" aria-hidden="true"></i>
+]])
+              main:reply("", window:jQuery("#" .. window:jQuery(this):attr("for")):val())
+            end)
+          
+          end
+          
+          queries = queries + 1
+        end
+        
+        multi.configuration.handlers.importer = function(path)
+          local result = js.global.jQuery:ajax({
+            type = "GET",
+            dataType = "text",
+            url = path,
+            async = "false"
+          })
+          return result.responseText
+        end
+        
+        multi.configuration.handlers.code_tester = function(parent, user, block)
+          local chunck, message
+          if string.lower(block.caption) == "lua" or (block.caption == "" and js.global.MODE_DEFAULT == "Lua") then
+            chunck, message = load(block.content)
+          elseif string.lower(block.caption) == "moonscript" or (block.caption == "" and js.global.MODE_DEFAULT == "Moonscript") then
+            local content = window.parseMoonscript(block.content)
+            chunck, message = load(content)
+          end
+          if chunck then
+            return true, nil
+          end
+          return false, message
+        end
+        
+        multi.configuration.handlers.code_loader = function(parent, user, block)
+          local sandbox
+          sandbox = function(environment)
+            local chunck, message
+            if string.lower(block.caption) == "lua" or (block.caption == "" and window.MODE_DEFAULT == "Lua") then
+              chunck, message = load(block.content, "sandbox string", "bt", environment)
+            elseif string.lower(block.caption) == "moonscript" or (block.caption == "" and window.MODE_DEFAULT == "Moonscript") then
+              local content = window.parseMoonscript(block.content)
+              chunck, message = load(content, "sandbox string", "bt", environment)
+            end
+            if chunck then
+              return true, chunck
+            else
+              return false, message
+            end
+          end
+          return sandbox(parent.sandboxes[user])
+        end
+        
+        window:jQuery("#stop"):click(function(this)
+          
+        end)
+        
+        window:jQuery("#pause"):click(function(this)
+          
+        end)
+
+        window:jQuery("#play"):click(function(this)
+          window:jQuery("#messages"):html("")
+          main = multi.new(window.CodeMirror:getValue())
+          main:open("")
+          main:define("", "javascript", js.global)
+          window:jQuery("#player"):css("display", "block")
+          window:jQuery("#stop"):css("display", "block")
+          window:jQuery("#pause"):css("display", "block")
+        end)
+
+      end)
+
+    </script>
+  </body>
+</html>
