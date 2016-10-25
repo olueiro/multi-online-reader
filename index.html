@@ -369,7 +369,7 @@
         window:jQuery("#play"):click(function(this)
           window:jQuery("#messages"):html("")
           main = multi.new(window.CodeMirror:getValue())
-          main:open("")
+          main:play("")
           main:define("", "javascript", js.global)
           window:jQuery("#player"):css("display", "block")
           window:jQuery("#stop"):css("display", "block")
